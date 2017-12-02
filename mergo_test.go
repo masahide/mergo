@@ -6,11 +6,12 @@
 package mergo
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"reflect"
 	"testing"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 type simpleTest struct {
@@ -658,5 +659,18 @@ func TestBooleanPointer(t *testing.T) {
 	}
 	if *dst.C != *src.C {
 		t.Fatalf("dst.C should be true")
+	}
+}
+
+// panic: 'reflect: call of reflect.Value.NumField on int64 Value' at time.Duration #50
+type testStruct struct {
+	time.Duration
+}
+
+func TestMergePanicCase(t *testing.T) {
+	to := testStruct{}
+	from := testStruct{}
+	if err := Merge(&to, from); err != nil {
+		t.Fail()
 	}
 }
